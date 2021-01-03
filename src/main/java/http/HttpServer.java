@@ -1,5 +1,9 @@
 package http;
 
+import common.RequestMapping;
+import domain.RequestBaseDo;
+import domain.ResponseDoFactory;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -28,7 +32,6 @@ public class HttpServer extends Thread {
   public static final Integer HTTP_OK = 200;
 
   private Socket connectedClient = null;
-  private BufferedReader inputFromClient = null;
   private DataOutputStream outputToClient = null;
 
 
@@ -40,6 +43,8 @@ public class HttpServer extends Thread {
   public void run() {
     System.out.println("The Client " + connectedClient.getInetAddress() + ":"
         + connectedClient.getPort() + " is connected");
+
+    Map<String,String> doMap = RequestMapping.getInstance().getReqMap();
 
     String result = "";
     String requestString = null;
@@ -116,7 +121,9 @@ public class HttpServer extends Thread {
 
       System.out.println("request:"+query);
 
-      //String传进do里，  解析包头
+      //根据请求实例化对应的实现类，大部分动作放到基类中执行，方便拓展接口
+      RequestBaseDo curDo = ResponseDoFactory.createRequestDo( doMap.get("req1") );
+      System.out.println(  curDo.deal()  );
 
 
       try {
